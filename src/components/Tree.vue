@@ -22,6 +22,7 @@
 
 <script>
 import TreeRow from './TreeRow.vue'
+import { recCallNodes } from './helper'
 
 export default {
   name: 'tree',
@@ -202,12 +203,11 @@ export default {
       }
     },
     doCheckNode (nodeId, depth, state) {
-      const arrIds = this.findNodePath(nodeId, depth)
-      if (!arrIds) return
-      this.callSpecificChild(arrIds, 'callNodeChecked', {
-        value: state,
-        arrIds: arrIds
-      })
+      const node = this.findNode(nodeId, depth)
+      if (node) {
+        node.state.checked = state
+        recCallNodes(state, 'checked', node.nodes)
+      }
     },
     checkNode (nodeId, depth) {
       this.doCheckNode(nodeId, depth, true)

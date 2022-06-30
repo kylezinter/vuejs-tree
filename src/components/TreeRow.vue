@@ -137,7 +137,8 @@
 </template>
 
 <script type="text/javascript">
-const disabledState = { expanded: 'expandable', checked: 'checkable', selected: 'selectable' }
+import { recCallNodes } from './helper'
+
 export default {
   name: 'tree-row',
   props: {
@@ -314,31 +315,14 @@ export default {
     emitNodeChecked (nodeChecked) { // redirect the event toward the Tree component
       this.$emit('emitNodeChecked', nodeChecked)
     },
-    recCallNodes (state, event, nodes, pathIds = []) {
-      if (nodes === undefined) { return }
-
-      const targetId = pathIds.shift()
-      nodes.forEach((node) => {
-        if (targetId !== undefined && targetId !== node.id) {
-          return
-        }
-        const disabledStateKey = (disabledState)[event]
-        if (targetId === node.id && pathIds.length === 0) {
-          node.state[event] = state
-          return
-        } else if (disabledStateKey && node[disabledStateKey] !== false) {
-          node.state[event] = state
-        }
-        this.recCallNodes(state, event, node.nodes, pathIds)
-      })
-    },
     callNodesChecked (state) {
+      console.log('callNodesChecked', state)
       this.checked = state
       for (let i = 0; i < this.$children.length; i++) {
         this.$children[i].callNodesChecked(state)
       }
       if (this.$children.length === 0 && this.node.nodes && this.node.nodes.length > 0) {
-        this.recCallNodes(state, 'checked', this.node.nodes)
+        recCallNodes(state, 'checked', this.node.nodes)
       }
     },
     callNodesDeselect () {
@@ -348,7 +332,7 @@ export default {
         this.$children[i].callNodesDeselect()
       }
       if (this.$children.length === 0 && this.node.nodes && this.node.nodes.length > 0) {
-        this.recCallNodes(false, 'selected', this.node.nodes)
+        recCallNodes(false, 'selected', this.node.nodes)
       }
     },
     callSpecificChild (arrIds, fname, args) {
