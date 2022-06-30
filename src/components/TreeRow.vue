@@ -137,6 +137,7 @@
 </template>
 
 <script type="text/javascript">
+const disabledState = { expanded: 'expandable', checked: 'checkable', selected: 'selectable' }
 export default {
   name: 'tree-row',
   props: {
@@ -315,7 +316,7 @@ export default {
     emitNodeChecked (nodeChecked) { // redirect the event toward the Tree component
       this.$emit('emitNodeChecked', nodeChecked)
     },
-    recCallNodes = (state, event, nodes, pathIds = []) => {
+    recCallNodes (state, event, nodes, pathIds = []) {
       if (nodes === undefined) { return }
 
       const targetId = pathIds.shift()
@@ -330,7 +331,7 @@ export default {
         } else if (disabledStateKey && node[disabledStateKey] !== false) {
           node.state[event] = state
         }
-        recCallNodes(state, event, node.nodes, pathIds)
+        this.recCallNodes(state, event, node.nodes, pathIds)
       })
     },
     callNodesChecked (state) {
