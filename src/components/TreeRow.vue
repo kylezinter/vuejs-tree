@@ -1,27 +1,48 @@
 <template>
-  <li
-    class="node"
-    :data-id="node.id"
-    :style="rowChildStyle">
+  <li class="node" :data-id="node.id" :style="rowChildStyle">
     <div
-      :class="['row_data', selected ? styles.row.child.active.class: styles.row.child.class]"
+      :class="[
+        'row_data',
+        selected ? styles.row.child.active.class : styles.row.child.class,
+      ]"
       :style="selected ? styles.row.child.active.style : styles.row.child.style"
-      @click="toggleEvent('selected', node)">
-      <span @click.stop="options.events.expanded.state == true && node.nodes != undefined && node.nodes.length > 0 && toggleEvent('expanded', node)">
+      @click="toggleEvent('selected', node)"
+    >
+      <span
+        @click.stop="
+          options.events.expanded.state == true &&
+            node.nodes != undefined &&
+            node.nodes.length > 0 &&
+            toggleEvent('expanded', node)
+        "
+      >
         <i
-          v-if="options.events.expanded.state == true && node.nodes != undefined && node.nodes.length > 0"
-          :class="[{'expanded': expanded == true}, styles.expanded.class]">
+          v-if="
+            options.events.expanded.state == true &&
+            node.nodes != undefined &&
+            node.nodes.length > 0
+          "
+          :class="[{ expanded: expanded == true }, styles.expanded.class]"
+        >
         </i>
         <span
-          v-else-if="options.events.expanded.state == true && node.nodes == undefined"
-          class="small-tree-indent">
+          v-else-if="
+            options.events.expanded.state == true && node.nodes == undefined
+          "
+          class="small-tree-indent"
+        >
         </span>
       </span>
       <i
         v-if="options.events.selected.state == true"
         @click.stop="toggleEvent('selected', node)"
-        :class="expanded ? styles.selectIcon.active.class : styles.selectIcon.class"
-        :style="selected ? styles.selectIcon.active.style : styles.selectIcon.style">
+        :class="
+          expanded ? styles.selectIcon.active.class : styles.selectIcon.class
+        "
+        :style="
+          selected ? styles.selectIcon.active.style : styles.selectIcon.style
+        "
+      >
       </i>
       <input
         type="checkbox"
@@ -30,47 +51,68 @@
         :checked="checked"
         v-if="options.events.checked.state == true"
         @click.stop="toggleEvent('checked', node)"
-      >
+      />
       <span
         data-toggle="tooltip"
         data-placement="top"
         :title="node.definition"
-        v-bind:class="[{'selected': selected}, styles.text.class]"
+        v-bind:class="[{ selected: selected }, styles.text.class]"
         :style="selected ? styles.text.active.style : styles.text.style"
-        @click.stop="options.events.editableName.state && toggleEvent('editableName', node)" >
+        @click.stop="
+          options.events.editableName.state && toggleEvent('editableName', node)
+        "
+      >
         {{ node.text }}
       </span>
       <span
         v-if="options.addNode.state == true"
         @click.stop="options.addNode.fn(node)"
-        class="icon_parent">
+        class="icon_parent"
+      >
         <i
-          v-bind:class="[{'icon-hover': options.addNode.appearOnHover}, styles.addNode.class]"
-          :style="styles.addNode.style">
+          v-bind:class="[
+            { 'icon-hover': options.addNode.appearOnHover },
+            styles.addNode.class,
+          ]"
+          :style="styles.addNode.style"
+        >
         </i>
       </span>
       <span
         v-if="options.editNode.state == true"
         @click.stop="options.editNode.fn(node)"
-        class="icon_parent">
+        class="icon_parent"
+      >
         <i
-        v-bind:class="[{'icon-hover': options.editNode.appearOnHover}, styles.editNode.class]"
-        :style="styles.editNode.style">
+          v-bind:class="[
+            { 'icon-hover': options.editNode.appearOnHover },
+            styles.editNode.class,
+          ]"
+          :style="styles.editNode.style"
+        >
         </i>
       </span>
       <span
         v-if="options.deleteNode.state == true"
         @click.stop="options.deleteNode.fn(node)"
-        class="icon_parent">
+        class="icon_parent"
+      >
         <i
-        v-bind:class="[{'icon-hover': options.deleteNode.appearOnHover}, styles.deleteNode.class]"
-        :style="styles.deleteNode.style">
+          v-bind:class="[
+            { 'icon-hover': options.deleteNode.appearOnHover },
+            styles.deleteNode.class,
+          ]"
+          :style="styles.deleteNode.style"
+        >
         </i>
       </span>
       <span v-if="options.showTags == true && node.tags">
         <span
-          v-if="node.tags[0] != undefined && node.tags[0]!= null && node.tags[0]"
-          class="badge">
+          v-if="
+            node.tags[0] != undefined && node.tags[0] != null && node.tags[0]
+          "
+          class="badge"
+        >
           {{ node.tags[0] }}
         </span>
       </span>
@@ -87,7 +129,8 @@
         :parent-node="node"
         v-on:emitNodeChecked="emitNodeChecked"
         v-on:emitNodeExpanded="emitNodeExpanded"
-        v-on:emitNodeSelected="emitNodeSelected">
+        v-on:emitNodeSelected="emitNodeSelected"
+      >
       </tree-row>
     </ul>
   </li>
@@ -260,10 +303,8 @@ export default {
     toggleChecked (node, instance) {
       this.checked = !this.checked
       this.node.state.checked = this.checked
-      this.$nextTick(() => {
-        this.callNodesChecked(this.checked)
-        this.$emit('emitNodeChecked', node)
-      })
+      this.callNodesChecked(this.checked)
+      this.$emit('emitNodeChecked', node)
     },
     emitNodeSelected (nodeSelected) { // redirect the event toward the Tree component
       this.$emit('emitNodeSelected', nodeSelected)
@@ -274,14 +315,22 @@ export default {
     emitNodeChecked (nodeChecked) { // redirect the event toward the Tree component
       this.$emit('emitNodeChecked', nodeChecked)
     },
-    recCallNodes (state, event, nodes) {
-      const _this = this
+    recCallNodes = (state, event, nodes, pathIds = []) => {
+      if (nodes === undefined) { return }
+
+      const targetId = pathIds.shift()
       nodes.forEach((node) => {
-        if (!node.state) node.state = { checked: false, expanded: false, selected: false }
-        node.state[event] = state
-        if (node.nodes) {
-          _this.recCallNodes(state, event, node.nodes)
+        if (targetId !== undefined && targetId !== node.id) {
+          return
         }
+        const disabledStateKey = (disabledState)[event]
+        if (targetId === node.id && pathIds.length === 0) {
+          node.state[event] = state
+          return
+        } else if (disabledStateKey && node[disabledStateKey] !== false) {
+          node.state[event] = state
+        }
+        recCallNodes(state, event, node.nodes, pathIds)
       })
     },
     callNodesChecked (state) {
@@ -367,7 +416,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
@@ -378,9 +426,9 @@ export default {
 .icon-hover {
   visibility: hidden;
   opacity: 0;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
-.row_data:hover .icon-hover{
+.row_data:hover .icon-hover {
   visibility: visible;
   opacity: 1;
 }
@@ -412,7 +460,7 @@ li {
 }
 .expanded_icon {
   transform: rotate(0deg);
-  transition: all ease .2s;
+  transition: all ease 0.2s;
   display: inline-block;
   width: 0;
   height: 0;
@@ -424,18 +472,18 @@ li {
   }
 }
 .add_icon:before {
-  content: '\002b';
+  content: "\002b";
 }
 .edit_icon:before {
-  content: '\00270e';
+  content: "\00270e";
 }
 .delete_icon:before {
-  content: '\00d7';
+  content: "\00d7";
 }
 .folder_icon:before {
-  content: '\1F5C0';
+  content: "\1F5C0";
 }
 .folder_icon_active:before {
-  content: '\1F5C1';
+  content: "\1F5C1";
 }
 </style>
