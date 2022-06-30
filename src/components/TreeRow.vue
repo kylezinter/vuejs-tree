@@ -292,9 +292,7 @@ export default {
     toggleExpanded (node, instance) {
       this.expanded = !this.expanded
       this.node.state.expanded = this.expanded
-      this.$nextTick(() => {
-        this.$emit('emitNodeExpanded', node, this.expanded)
-      })
+      this.$emit('emitNodeExpanded', node, this.expanded)
     },
     toggleSelected (node, instance) {
       this.selected = !this.selected
@@ -370,9 +368,7 @@ export default {
         this.callNodesChecked(this.checked)
       } else {
         this.expanded = true
-        this.$nextTick(() => {
-          this.callSpecificChild(arrIds, 'callNodeChecked', args)
-        })
+        this.callSpecificChild(arrIds, 'callNodeChecked', args)
       }
     },
     callNodeSelected (args) {
@@ -382,9 +378,7 @@ export default {
         this.selected = value
       } else {
         this.expanded = true
-        this.$nextTick(() => {
-          this.callSpecificChild(arrIds, 'callNodeSelected', args)
-        })
+        this.callSpecificChild(arrIds, 'callNodeSelected', args)
       }
     },
     callNodeExpanded (args) {
@@ -394,9 +388,7 @@ export default {
       if (arrIds[arrIds.length - 1] != this.node.id) {
         if (value === true) {
           this.expanded = true
-          this.$nextTick(() => {
-            this.callSpecificChild(arrIds, 'callNodeExpanded', args)
-          })
+          this.callSpecificChild(arrIds, 'callNodeExpanded', args)
         } else {
           this.callSpecificChild(arrIds, 'callNodeExpanded', args)
         }
@@ -419,7 +411,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .small-tree-indent {
   margin: 0 3px;
   display: inline-block;
@@ -451,13 +443,13 @@ li {
   vertical-align: middle;
   text-align: center;
   margin: 0 2px 0 0;
-  i {
-    font-size: 16px;
-    line-height: 10px;
-  }
-  &:last-child {
-    margin: 0;
-  }
+}
+.icon_parent i {
+  font-size: 16px;
+  line-height: 10px;
+}
+.icon_parent:last-child {
+  margin: 0;
 }
 .expanded_icon {
   transform: rotate(0deg);
@@ -468,9 +460,9 @@ li {
   border-style: solid;
   border-width: 4px 0 4px 8px;
   border-color: transparent transparent transparent #555;
-  &.expanded {
-    transform: rotate(90deg);
-  }
+}
+.expanded_icon.expanded {
+  transform: rotate(90deg);
 }
 .add_icon:before {
   content: "\002b";
